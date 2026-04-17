@@ -1,21 +1,28 @@
-name: 部署静态网站
+name: 自动部署纯 HTML 网站
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ] 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 部署静态网站
+      - name: SSH Remote Commands
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # 1. 进入队伍目录
             cd /www/qingyun/team1
+            
+            # 2. 拉取你刚写的 HTML 代码
             git pull origin main
+            
+            # 3. 杀掉占用 8001 端口的旧程序（如果有的话）
             fuser -k 8001/tcp || true
+            
+            # 4. 终极魔法：直接用 Python 启动当前目录的静态网页服务！
             nohup python3 -m http.server 8001 > server.log 2>&1 &
