@@ -1,4 +1,4 @@
-name: 自动部署
+name: 部署静态网站
 
 on:
   push:
@@ -8,7 +8,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 远程连接并启动服务
+      - name: 部署静态网站
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -18,5 +18,4 @@ jobs:
             cd /www/qingyun/team1
             git pull origin main
             fuser -k 8001/tcp || true
-            nohup python3 app.py > server.log 2>&1 &
-
+            nohup python3 -m http.server 8001 > server.log 2>&1 &
